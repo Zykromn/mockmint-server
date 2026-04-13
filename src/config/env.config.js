@@ -31,6 +31,10 @@ const config = {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
 
+    cors: {
+        origin: envVars.origin,
+    },
+
     db: {
         url: envVars.DATABASE_URL,
     },

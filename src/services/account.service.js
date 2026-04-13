@@ -1,5 +1,5 @@
 import DB from '../db/db.js';
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/errors.js';
 
 class AccountService {
     constructor() {

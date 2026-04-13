@@ -26,7 +26,7 @@ DB.initialize()
 
 // 2. БАЗОВЫЕ MIDDLEWARES
 app.use(cors({
-    origin: config.cors.origin, // Настроено в env.config.js (обычно http://localhost:3000)
+    origin: true,
     credentials: true
 }));
 app.use(express.json());
@@ -46,7 +46,7 @@ app.use('/account', AccountRoutes);
 app.use(errorHandler);
 
 // ЗАПУСК СЕРВЕРА
-const PORT = config.server.port || 5000;
+const PORT = config.port || 5000;
 app.listen(PORT, () => {
     logger.info(`Server is running on port ${PORT}`);
 });

@@ -15,6 +15,22 @@ class MockController {
         } catch (e) { next(e); }
     }
 
+    async getHistory(req, res, next) {
+        try {
+            const mocks = await MockService.getHistory(req.user.id);
+            res.status(200).json({ code: 'MOCKS_HIST_SUCCESS', mocks });
+        } catch (e) { next(e); }
+    }
+
+    async getChapters(req, res, next) {
+        try {
+            const chapters = await MockService.getChapters();
+            res.status(200).json({ code: 'MOCKS_CHAPS_GETSUCC', chapters });
+        } catch (e) {
+            next(e);
+        }
+    }
+
     async submit(req, res, next) {
         try {
             // Передаем task_id вместо index

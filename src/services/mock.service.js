@@ -1,5 +1,5 @@
 import DB from '../db/db.js';
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/errors.js';
 import logger from '../utils/logger.js';
 
 class MockService {
@@ -76,6 +76,34 @@ class MockService {
         await this.testRepo.save(testsPull);
 
         return mock.id;
+    }
+
+    async getChapters() {
+        // Подтягиваем главы вместе с массивом их слагов
+        const chapters = await this.chapterRepo.find({
+            relations: ['slugs']
+        });
+
+        // Дожидаемся подсчета всех задач
+        const responseData = await Promise.all(chapters.map(async (ch) => {
+            let total_tasks = 0;
+            const slugs = [];
+
+            await Promise.all(ch.slugs.map(async (s) => {
+                const amount = await this.taskRepo.count({where: {slug: s.slug}});
+                total_tasks += amount;
+                slugs.push(s.slug);
+            }));
+
+            return {
+                chapter: ch.chapter,
+                title: ch.title,
+                slugs: slugs,
+                total_tasks: total_tasks
+            };
+        }));
+
+        return responseData;
     }
 
     async getMockDetails(mockId, userId) {
@@ -156,6 +184,18 @@ class MockService {
         await this.mockRepo.save(mock);
 
         return { points: mock.points, timer: mock.timer };
+    }
+
+    async getHistory(userId) {
+        if (!userId) throw new AppError('MOCKS_HIST_AUTHREQ', 401);
+
+        // Достаем все моки пользователя, сортируем от новых к старым
+        const mocks = await this.mockRepo.find({
+            where: { client_id: userId },
+            order: { created_at: 'DESC' }
+        });
+
+        return mocks;
     }
 }
 

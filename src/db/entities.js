@@ -55,7 +55,7 @@ export const Chapter = new EntitySchema({
     tableName: 'chapters',
     columns: {
         chapter: { type: 'varchar', length: 50, primary: true },
-        title:   { type: 'jsonb', unique: true }
+        title:   { type: 'jsonb' }
     },
     relations: {
         slugs: { target: 'Slug', type: 'one-to-many', inverseSide: 'chapter_rel' }
@@ -69,7 +69,7 @@ export const Slug = new EntitySchema({
     columns: {
         slug:    { type: 'varchar', length: 100, primary: true },
         chapter: { type: 'varchar', length: 50 },
-        pattern: { type: 'jsonb', unique: true }
+        pattern: { type: 'jsonb' }
     },
     relations: {
         chapter_rel: {

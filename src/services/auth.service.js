@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import DB from '../db/db.js';
 import Mailer from '../utils/mailer.js';
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/errors.js';
 
 class AuthService {
     constructor() {

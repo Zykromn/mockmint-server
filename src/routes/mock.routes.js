@@ -10,5 +10,7 @@ MockRoutes.post('/generate', authCheck, validate(MockValidator.generate), MockCo
 MockRoutes.get('/get', validate(MockValidator.getMock, 'query'), MockController.get);
 MockRoutes.post('/submit', authCheck, validate(MockValidator.submit), MockController.submit);
 MockRoutes.post('/finish', authCheck, validate(MockValidator.finish), MockController.finish);
+MockRoutes.get('/history', authCheck, MockController.getHistory);
+MockRoutes.get('/chapters', MockController.getChapters);
 
 export default MockRoutes;
