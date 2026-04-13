@@ -1,6 +1,8 @@
 import { EntitySchema } from "typeorm";
 
-// PUBLIC SCHEMA
+// ==========================================
+// SCHEMA: public (Users & Auth)
+// ==========================================
 export const Client = new EntitySchema({
     name: 'Client',
     schema: 'public',
@@ -14,14 +16,11 @@ export const Client = new EntitySchema({
         payment_id:  { type: 'varchar', length: 255, nullable: true },
         sub_status:  { type: 'boolean', default: false },
         sub_exp:     { type: 'timestamp', nullable: true },
-        is_verified: { type: 'boolean', default: false },
+        is_verified: { type: 'boolean', default: false }
     },
     relations: {
-        mocks: {
-            target: 'Mock',
-            type: 'one-to-many',
-            inverseSide: 'client'
-        }
+        mocks: { target: 'Mock', type: 'one-to-many', inverseSide: 'client' },
+        tokens: { target: 'Token', type: 'one-to-many', inverseSide: 'client', cascade: true }
     }
 });
 
@@ -33,7 +32,7 @@ export const Token = new EntitySchema({
         id:         { type: 'uuid', primary: true, generated: 'uuid' },
         client_id:  { type: 'uuid' },
         token:      { type: 'varchar', length: 255, unique: true },
-        type:       { type: 'varchar', length: 50 },
+        type:       { type: 'varchar', length: 50 }, // 'verify_email' | 'reset_password'
         expires_at: { type: 'timestamp' }
     },
     relations: {
@@ -47,7 +46,9 @@ export const Token = new EntitySchema({
     }
 });
 
-// MATH_VALUES SCHEMA
+// ==========================================
+// SCHEMA: math_values (Dictionary & Content)
+// ==========================================
 export const Chapter = new EntitySchema({
     name: 'Chapter',
     schema: 'math_values',
@@ -57,11 +58,7 @@ export const Chapter = new EntitySchema({
         title:   { type: 'jsonb', unique: true }
     },
     relations: {
-        slugs: {
-            target: 'Slug',
-            type: 'one-to-many',
-            inverseSide: 'chapter_rel'
-        }
+        slugs: { target: 'Slug', type: 'one-to-many', inverseSide: 'chapter_rel' }
     }
 });
 
@@ -71,8 +68,8 @@ export const Slug = new EntitySchema({
     tableName: 'slugs',
     columns: {
         slug:    { type: 'varchar', length: 100, primary: true },
-        chapter: { type: 'varchar', length: 50 }, 
-        pattern: { type: 'jsonb' }
+        chapter: { type: 'varchar', length: 50 },
+        pattern: { type: 'jsonb', unique: true }
     },
     relations: {
         chapter_rel: {
@@ -82,11 +79,7 @@ export const Slug = new EntitySchema({
             inverseSide: 'slugs',
             onDelete: 'CASCADE'
         },
-        tasks: {
-            target: 'Task',
-            type: 'one-to-many',
-            inverseSide: 'slug_rel'
-        }
+        tasks: { target: 'Task', type: 'one-to-many', inverseSide: 'slug_rel' }
     }
 });
 
@@ -111,15 +104,13 @@ export const Task = new EntitySchema({
             inverseSide: 'tasks',
             onDelete: 'CASCADE'
         },
-        tests: {
-            target: 'Test',
-            type: 'one-to-many',
-            inverseSide: 'task'
-        }
+        tests: { target: 'Test', type: 'one-to-many', inverseSide: 'task' }
     }
 });
 
-// MATH_MOCKS SCHEMA
+// ==========================================
+// SCHEMA: math_mocks (User Progress)
+// ==========================================
 export const Mock = new EntitySchema({
     name: 'Mock',
     schema: 'math_mocks',
@@ -134,12 +125,7 @@ export const Mock = new EntitySchema({
         timer:        { type: 'bigint', nullable: true },
     },
     relations: {
-        tests: {
-            target: 'Test',
-            type: 'one-to-many',
-            inverseSide: 'mock',
-            cascade: true
-        },
+        tests: { target: 'Test', type: 'one-to-many', inverseSide: 'mock', cascade: true },
         client: {
             target: 'Client',
             type: 'many-to-one',
@@ -158,7 +144,7 @@ export const Test = new EntitySchema({
         mock_id:     { type: 'uuid', primary: true },
         task_id:     { type: 'uuid', primary: true },
         index:       { type: 'int' },
-        response:    { type: 'text', nullable: true }, // Заменили answer на response
+        response:    { type: 'text', nullable: true },
         is_correct:  { type: 'boolean', nullable: true }
     },
     relations: {
