@@ -58,7 +58,6 @@ class MockService {
             }
         }
 
-        // Если из-за нехватки задач в конкретных слагах мы не добрали общую сумму
         if (tasksPull.length !== mockConfig.amount) {
             throw new AppError('MOCKS_GEN_INVTC', 400);
         }

@@ -1,52 +1,60 @@
+import logger from './src/utils/logger.js';
+import config from './src/config/env.config.js';
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import passport from 'passport';
 
-import config from './src/config/env.config.js';
 import DB from './src/db/db.js';
 import passportSetup from './src/config/passport.setup.js';
-import logger from './src/utils/logger.js';
 
-// Импорт роутов
 import AuthRoutes from './src/routes/auth.routes.js';
 import MockRoutes from './src/routes/mock.routes.js';
 import AccountRoutes from './src/routes/account.router.js';
 
-// Импорт middlewares
 import sessionMiddleware from './src/middlewares/sessions.js';
 import { errorHandler } from './src/middlewares/error.middleware.js';
 
+
 const app = express();
 
-// 1. ПОДКЛЮЧЕНИЕ К БД
-DB.initialize()
-    .then(() => logger.info('Database connected successfully'))
-    .catch((err) => logger.error('Database connection error:', err));
+async function launch() {
+    logger.info('========= MockMint Server =========');
 
-// 2. БАЗОВЫЕ MIDDLEWARES
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+    try {
+        await DB.initialize();
+        logger.info('Database launched successfully.');
+    } catch (error) {
+        logger.error(`Database error: ${error}`);
+        process.exit(-1);
+    }
 
-// 3. СЕССИИ И PASSPORT
-app.use(sessionMiddleware);
-passportSetup(app); // Инициализация passport и стратегий
+    app.use(cors({
+        origin: true,
+        credentials: true
+    }));
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
-// 4. РОУТЫ
-app.use('/auth', AuthRoutes);
-app.use('/mocks', MockRoutes);
-app.use('/account', AccountRoutes);
+    try {
+        app.use(sessionMiddleware);
+        passportSetup(app);
+        logger.info('Auth strategies initialized.');
+    } catch (error) {
+        logger.error(`AuthStrategies error: ${error}`);
+        process.exit(-2);
+    }
 
-// 5. ОБРАБОТКА ОШИБОК (Обязательно ПОСЛЕ всех роутов)
-app.use(errorHandler);
+    app.use('/auth', AuthRoutes);
+    app.use('/mocks', MockRoutes);
+    app.use('/account', AccountRoutes);
+    app.use(errorHandler);
 
-// ЗАПУСК СЕРВЕРА
-const PORT = config.port || 5000;
-app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
-});
+    const PORT = config.port;
+    app.listen(PORT, () => {
+        logger.info(`===== Server started. ${PORT} =====`);
+    });
+}
+
+launch();

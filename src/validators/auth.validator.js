@@ -1,6 +1,7 @@
 import Joi from 'joi';
 
-export const AuthValidator = {
+
+const AuthValidator = {
     signup: Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
@@ -12,16 +13,18 @@ export const AuthValidator = {
         password: Joi.string().required()
     }),
 
+    verify: Joi.object({
+        token: Joi.string().required()
+    }),
+
     forgotPassword: Joi.object({
         email: Joi.string().email().required()
     }),
 
     resetPassword: Joi.object({
         token: Joi.string().required(),
-        new_password: Joi.string().min(6).required()
-    }),
-
-    verifyEmail: Joi.object({
-        token: Joi.string().required()
+        password: Joi.string().min(6).required()
     })
 };
+
+export default AuthValidator;

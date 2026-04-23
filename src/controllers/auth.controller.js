@@ -12,7 +12,6 @@ class AuthController {
         }
     }
 
-    // Signin вызывается после успешного Passport.authenticate
     async signin(req, res) {
         return res.status(200).json({
             code: 'AUTH_SIGNIN_SUCCESS',
@@ -45,7 +44,7 @@ class AuthController {
 
     async resetPassword(req, res, next) {
         try {
-            await AuthService.resetPassword(req.body.token, req.body.new_password);
+            await AuthService.resetPassword(req.body.token, req.body.password);
             return res.status(200).json({ code: 'AUTH_RESET_SUCCESS' });
         } catch (error) {
             next(error);

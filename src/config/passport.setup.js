@@ -1,9 +1,11 @@
+import config from './env.config.js';
+import DB from '../db/db.js';
+
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import config from './env.config.js';
-import DB from '../db/db.js';
+
 
 const passportSetup = (app) => {
     app.use(passport.initialize());
@@ -32,16 +34,16 @@ const passportSetup = (app) => {
                 client = clientsRepo.create({
                     google_auth: profile.id,
                     email: profile.emails[0].value,
-                    alias: profile.displayName, // ИСПРАВЛЕНО: name -> alias
+                    alias: profile.displayName,
                 });
                 await clientsRepo.save(client);
             } else {
-                client.alias = profile.displayName; // ИСПРАВЛЕНО: name -> alias
+                client.alias = profile.displayName;
                 await clientsRepo.save(client);
             }
             return next(null, client);
         } catch (error) {
-            return next(error); // ИСПРАВЛЕНО: throw error -> next(error)
+            return next(error);
         }
     }));
 
@@ -53,7 +55,6 @@ const passportSetup = (app) => {
         try {
             const user = await clientsRepo.findOneBy({ email });
             if (!user || !user.password) {
-                // ИСПРАВЛЕНО: добавили код ошибки для роутера
                 return next(null, false, { code: 'AUTH_SIGNIN_WRNGDATA' });
             }
 
@@ -64,7 +65,7 @@ const passportSetup = (app) => {
 
             return next(null, user);
         } catch (error) {
-            return next(error); // ИСПРАВЛЕНО: throw error -> next(error)
+            return next(error);
         }
     }));
 };

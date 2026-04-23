@@ -3,7 +3,7 @@ export class AppError extends Error {
         super(messageCode);
         this.statusCode = statusCode;
         this.messageCode = messageCode;
-        this.isOperational = true; // Флаг, отличающий наши контролируемые ошибки от системных (багов)
+        this.isOperational = true;
         Error.captureStackTrace(this, this.constructor);
     }
 }

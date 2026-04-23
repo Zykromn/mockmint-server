@@ -1,6 +1,8 @@
-import nodemailer from 'nodemailer';
 import config from '../config/env.config.js';
 import logger from './logger.js';
+
+import nodemailer from 'nodemailer';
+
 
 const transporter = nodemailer.createTransport({
     host: config.smtp.host,
@@ -14,27 +16,25 @@ const transporter = nodemailer.createTransport({
 
 class Mailer {
     static async sendVerificationEmail(to, alias, token) {
-        // Ссылка, по которой кликнет пользователь
-        const link = `http://localhost:3000/verify-email?token=${token}`;
+        const link = `${config.cors.origin}auth/verify-email?token=${token}`;
 
         const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Привет, ${alias}!</h2>
-                <p>Добро пожаловать в <b>MockMint</b> — платформу для генерации мок-экзаменов.</p>
-                <p>Чтобы завершить регистрацию и получить доступ ко всем функциям, подтверди свою почту:</p>
-                <a href="${link}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Подтвердить Email</a>
-                <p style="margin-top: 30px; font-size: 12px; color: #888;">Эта ссылка действительна 24 часа. Если ты не регистрировался на MockMint, просто проигнорируй это письмо.</p>
-            </div>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto;">
+    <h2 style="color: #4a5dbe;">MockMint | Email verification</h2>
+    <p>Welcome to <b>MockMint.org</b>.</p>
+    <p>To complete the registration and access the service, please confirm your email address.</p>
+    <a href="${link}" style="display: inline-block; padding: 1rem; background-color: #4a5dbe; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 1rem 0;">Verify Email</a>
+    <p style="font-size: 1rem; color: #888;">This link is valid for 24 hours. If you have not registered on MockMint.org, please ignore this email.</p>
+</div>
         `;
 
         try {
             await transporter.sendMail({
                 from: config.smtp.from,
                 to: to,
-                subject: 'Подтверждение регистрации | MockMint',
+                subject: 'Email verification | MockMint.org',
                 html: html
             });
-            logger.info(`Verification email sent to ${to}`);
         } catch (error) {
             logger.error(`SMTP Error sending email to ${to}:`, error);
             throw error;
@@ -42,29 +42,27 @@ class Mailer {
     }
 
     static async sendPasswordResetEmail(to, alias, token) {
-        const link = `http://localhost:3000/reset-password?token=${token}`;
+        const link = `${config.cors.origin}reset-password?token=${token}`;
 
         const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Привет, ${alias}!</h2>
-                <p>Мы получили запрос на сброс пароля для твоего аккаунта в <b>MockMint</b>.</p>
-                <p>Если это был ты, нажми на кнопку ниже, чтобы придумать новый пароль:</p>
-                <a href="${link}" style="display: inline-block; padding: 12px 24px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Сбросить пароль</a>
-                <p style="margin-top: 30px; font-size: 12px; color: #888;">Эта ссылка действительна 1 час. Если ты не запрашивал сброс пароля, просто проигнорируй это письмо. Твой аккаунт в безопасности.</p>
-            </div>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto;">
+    <h2 style="color: #4a5dbe;">MockMint | Reset password</h2>
+    <p>We have received a request to reset the password for your account for the MockMint.org.</p>
+    <p><b>If you have sent the request, please click on the button below to reset the password. If you have not sent a request for password reset, please ignore this email.</b></p>
+    <a href="${link}" style="display: inline-block; padding: 1rem; background-color: #4a5dbe; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 1rem 0;">Reset password</a>
+    <p style="margin-top: 30px; font-size: 12px; color: #888;">This link is valid for 1 hour. If you have not registered on MockMint.org, please ignore this email.</p>
+</div>
         `;
 
         try {
             await transporter.sendMail({
                 from: config.smtp.from,
                 to: to,
-                subject: 'Сброс пароля | MockMint',
+                subject: 'Reset password | MockMint.org',
                 html: html
             });
-            logger.info(`Password reset email sent to ${to}`);
         } catch (error) {
             logger.error(`SMTP Error sending reset email to ${to}:`, error);
-            // Не прокидываем ошибку дальше, чтобы сервер не ответил 500
         }
     }
 }

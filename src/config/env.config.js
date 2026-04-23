@@ -11,6 +11,8 @@ const envSchema = Joi.object({
     PORT: Joi.number()
         .default(5050),
 
+    ORIGIN: Joi.string().required(),
+
     DATABASE_URL: Joi.string().required(),
 
     SESSION_SECRET: Joi.string().required(),
@@ -57,6 +59,5 @@ const config = {
         from: process.env.SMTP_FROM
     }
 }
-
 
 export default config;

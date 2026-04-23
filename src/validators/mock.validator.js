@@ -1,12 +1,14 @@
 import Joi from 'joi';
 
-export const MockValidator = {
+
+const MockValidator = {
     generate: Joi.object({
         mock_config: Joi.object({
             amount: Joi.number().integer().positive().required(),
             timed: Joi.boolean().required(),
             instant_check: Joi.boolean().required(),
-            lang: Joi.string().valid('en', 'ch').required()
+            lang: Joi.string().valid('en', 'ch').required(),
+            limit: Joi.number()
         }).required(),
         test_config: Joi.object().pattern(
             Joi.string(),
@@ -20,16 +22,18 @@ export const MockValidator = {
 
     submit: Joi.object({
         mock_id: Joi.string().uuid().required(),
-        task_id: Joi.string().uuid().required(), // Заменили index на task_id
+        task_id: Joi.string().uuid().required(),
         response: Joi.string().allow('').required()
     }),
 
     finish: Joi.object({
         mock_id: Joi.string().uuid().required(),
-        time_spent: Joi.number().integer().min(0).required() // Принимаем время от клиента
+        time_spent: Joi.number().integer().min(0).required()
     }),
 
     getSlug: Joi.object({
         slug: Joi.string().required()
     })
 };
+
+export default MockValidator;
